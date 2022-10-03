@@ -1,0 +1,57 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: github-find-pull-request-by-commit
+spec:
+  params:
+    - name: base
+      type: string
+      description: Base reference to query.
+      default: "main"
+    - name: baseUrl
+      type: string
+      description: URL of the GitHub API
+      default: https://api.github.com
+    - name: owner
+      type: string
+      description: Owner (user or organization name) of the repository.
+    - name: repo
+      type: string
+      description: Name of the repository.
+    - name: sha
+      type: string
+      description: SHA of the commit.
+    - name: token
+      type: string
+      description: GitHub access token.
+
+  results:
+    - name: id
+      description: ID of the pull request.
+
+    - name: number
+      description: Number of the pull request.
+
+    - name: state
+      description: State of the pull request. "open" or "closed" is supported.
+
+  steps:
+    - name: post
+      image: 1915keke/github-find-pull-request-by-commit:v0.0.1
+      args:
+        - --baseUrl
+        - $(params.baseUrl)
+        - --owner
+        - $(params.owner)
+        - --repo
+        - $(params.repo)
+        - --resultsPullRequestId
+        - $(results.id.path)
+        - --resultPullRequestNumber
+        - $(results.number.path)
+        - --resultPullRequestState
+        - $(results.state.path)
+        - --sha
+        - $(params.sha)
+        - --token
+        - $(params.token)
